@@ -13,6 +13,8 @@ import { StudentProfileView } from "./components/student/StudentProfileView";
 import { StudentActivitiesView } from "./components/student/StudentActivitiesView";
 import { FacultyStudentsView } from "./components/faculty/FacultyStudentsView";
 import { FacultyReviewView } from "./components/faculty/FacultyReviewView";
+import { useNavigate, Link } from "react-router-dom";
+import { Shield, Users, GraduationCap } from "lucide-react";
 
 export interface User {
   id: string;
@@ -52,51 +54,78 @@ export type NavigationSection =
   | 'students'
   | 'review';
 
-export default function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+interface AppProps {
+  currentUser?: User | null;
+  setCurrentUser?: React.Dispatch<React.SetStateAction<User | null>>;
+  activities?: Activity[];
+  setActivities?: React.Dispatch<React.SetStateAction<Activity[]>>;
+  users?: User[];
+  setUsers?: React.Dispatch<React.SetStateAction<User[]>>;
+  onLogout?: () => void;
+}
+
+export default function App(props: AppProps) {
+  // Use props if provided, otherwise use local state (for backward compatibility)
+  const [localCurrentUser, setLocalCurrentUser] = useState<User | null>(null);
+  const [localActivities, setLocalActivities] = useState<Activity[]>([]);
+  const [localUsers, setLocalUsers] = useState<User[]>([]);
   const [currentSection, setCurrentSection] = useState<NavigationSection>('dashboard');
 
-  // Load user and activities from localStorage on mount
+  // Use props or local state
+  const currentUser = props.currentUser !== undefined ? props.currentUser : localCurrentUser;
+  const setCurrentUser = props.setCurrentUser || setLocalCurrentUser;
+  const activities = props.activities !== undefined ? props.activities : localActivities;
+  const setActivities = props.setActivities || setLocalActivities;
+  const users = props.users !== undefined ? props.users : localUsers;
+  const setUsers = props.setUsers || setLocalUsers;
+  let navigate: any = null;
+  try {
+    navigate = useNavigate();
+  } catch (error) {
+    // useNavigate is not available when not wrapped in Router
+  }
+
+  // Load user and activities from localStorage on mount (only if not using props)
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('currentUser');
-      const savedActivities = localStorage.getItem('activities');
-      const savedUsers = localStorage.getItem('users');
-      
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        if (parsedUser && typeof parsedUser === 'object') {
-          setCurrentUser(parsedUser);
+    if (props.currentUser === undefined) {
+      try {
+        const savedUser = localStorage.getItem('currentUser');
+        const savedActivities = localStorage.getItem('activities');
+        const savedUsers = localStorage.getItem('users');
+        
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser);
+          if (parsedUser && typeof parsedUser === 'object') {
+            setCurrentUser(parsedUser);
+          }
         }
-      }
-      
-      if (savedActivities) {
-        const parsedActivities = JSON.parse(savedActivities);
-        if (Array.isArray(parsedActivities)) {
-          setActivities(parsedActivities);
+        
+        if (savedActivities) {
+          const parsedActivities = JSON.parse(savedActivities);
+          if (Array.isArray(parsedActivities)) {
+            setActivities(parsedActivities);
+          } else {
+            initializeSampleData();
+          }
         } else {
           initializeSampleData();
         }
-      } else {
-        initializeSampleData();
-      }
 
-      if (savedUsers) {
-        const parsedUsers = JSON.parse(savedUsers);
-        if (Array.isArray(parsedUsers)) {
-          setUsers(parsedUsers);
+        if (savedUsers) {
+          const parsedUsers = JSON.parse(savedUsers);
+          if (Array.isArray(parsedUsers)) {
+            setUsers(parsedUsers);
+          } else {
+            initializeSampleUsers();
+          }
         } else {
           initializeSampleUsers();
         }
-      } else {
+      } catch (error) {
+        console.error('Error loading data from localStorage:', error);
+        initializeSampleData();
         initializeSampleUsers();
       }
-    } catch (error) {
-      console.error('Error loading data from localStorage:', error);
-      initializeSampleData();
-      initializeSampleUsers();
     }
   }, []);
 
@@ -263,14 +292,14 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = props.onLogout || (() => {
     setCurrentUser(null);
     try {
       localStorage.removeItem('currentUser');
     } catch (error) {
       console.error('Error removing user from localStorage:', error);
     }
-  };
+  });
 
   const addActivity = (activityData: Omit<Activity, 'id' | 'submittedAt' | 'status'>) => {
     const newActivity: Activity = {
@@ -319,11 +348,35 @@ export default function App() {
     }));
   };
 
-  // If no user is logged in, show login form
+  // If no user is logged in, show login form with access portals
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-background">
         <LoginForm onLogin={handleLogin} users={users} />
+        
+        {/* Access Portal Links */}
+        <div className="fixed bottom-8 right-8 flex flex-col gap-3">
+          <div className="text-sm text-gray-600 mb-2 font-semibold">Direct Access:</div>
+          <Link to="/student-access">
+            <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg flex items-center gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Student Portal →
+            </button>
+          </Link>
+          <Link to="/faculty-access">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Faculty Portal →
+            </button>
+          </Link>
+          <Link to="/admin-access">
+            <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-lg flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Admin Portal →
+            </button>
+          </Link>
+        </div>
+        
         <Toaster position="bottom-right" />
       </div>
     );
