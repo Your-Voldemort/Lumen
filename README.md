@@ -1,5 +1,4 @@
 # Lumen
-
 A comprehensive student achievement tracking and management platform built with React and TypeScript. Lumen provides a modern, role-based system for students, faculty, and administrators to manage academic activities, track progress, and generate reports.
 
 ## Features
