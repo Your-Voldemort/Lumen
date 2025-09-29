@@ -137,13 +137,14 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
             <Button 
               variant="outline" 
               className="w-full h-12"
+              disabled={isLoggingOut}
               onClick={() => {
                 setIsMenuOpen(false);
                 logout();
               }}
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
             </Button>
           </div>
         </div>
