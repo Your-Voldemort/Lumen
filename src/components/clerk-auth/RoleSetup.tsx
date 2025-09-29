@@ -151,6 +151,23 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
                   </div>
                 </div>
               </div>
+
+              <div
+                onClick={() => setSelectedRole('superadmin')}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  selectedRole === 'superadmin'
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Crown className="h-6 w-6 text-red-600" />
+                  <div>
+                    <h3 className="font-semibold">Super Administrator</h3>
+                    <p className="text-sm text-muted-foreground">Master access to all system functions</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Department Input */}
