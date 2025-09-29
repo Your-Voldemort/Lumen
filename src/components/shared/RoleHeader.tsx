@@ -203,7 +203,7 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
                 </AvatarFallback>
               </Avatar>
 
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <Button variant="outline" size="sm" onClick={logout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
@@ -218,7 +218,7 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="sm" onClick={onLogout}>
+              <Button variant="ghost" size="sm" onClick={logout}>
                 <LogOut className="h-4 w-4" />
                 <span className="sr-only">Logout</span>
               </Button>
