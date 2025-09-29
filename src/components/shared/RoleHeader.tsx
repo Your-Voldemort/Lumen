@@ -17,7 +17,7 @@ interface RoleHeaderProps {
 export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
-  const { logout } = useLogout();
+  const { logout, isLoggingOut } = useLogout();
 
   const getRoleIcon = (role: string) => {
     switch (role) {
