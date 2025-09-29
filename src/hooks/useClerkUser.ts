@@ -1,6 +1,15 @@
 import { useUser } from '@clerk/clerk-react';
 import { useState, useEffect } from 'react';
-import type { User } from '../../App';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'student' | 'faculty' | 'admin';
+  department?: string;
+  year?: string;
+  studentId?: string;
+}
 
 // Hook to map Clerk user to application user
 export function useClerkUser() {
