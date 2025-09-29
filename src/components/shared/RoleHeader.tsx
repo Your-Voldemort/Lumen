@@ -223,9 +223,9 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="sm" onClick={logout}>
+              <Button variant="ghost" size="sm" disabled={isLoggingOut} onClick={logout}>
                 <LogOut className="h-4 w-4" />
-                <span className="sr-only">Logout</span>
+                <span className="sr-only">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </Button>
             </div>
           )}
