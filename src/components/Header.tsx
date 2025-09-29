@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Bell, Search, Settings, BookOpen, Trophy, BarChart3 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { GlobalSearch } from "./shared/GlobalSearch";
 import { ClerkAuthButton } from "./clerk-auth/ClerkAuthButton";
 import type { User, Activity } from "../App";
