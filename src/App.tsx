@@ -287,15 +287,6 @@ export default function App(props: AppProps) {
     }
   };
 
-  const handleLogout = props.onLogout || (() => {
-    setCurrentUser(null);
-    try {
-      localStorage.removeItem('currentUser');
-    } catch (error) {
-      console.error('Error removing user from localStorage:', error);
-    }
-  });
-
   const addActivity = (activityData: Omit<Activity, 'id' | 'submittedAt' | 'status'>) => {
     const newActivity: Activity = {
       ...activityData,
