@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import App from "./App";
-import { ClerkSignInPage } from "./components/clerk-auth/ClerkSignInPage";
-import { ClerkSignUpPage } from "./components/clerk-auth/ClerkSignUpPage";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
 import { RoleSpecificSignInPage } from "./components/auth/RoleSpecificSignInPage";
 import { RoleSpecificSignUpPage } from "./components/auth/RoleSpecificSignUpPage";
