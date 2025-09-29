@@ -85,7 +85,7 @@ function determineUserRole(user: any): 'student' | 'faculty' | 'admin' | 'supera
 export function useUpdateUserMetadata() {
   const { user } = useUser();
 
-  const updateUserRole = async (role: 'student' | 'faculty' | 'admin', additionalData: any = {}) => {
+  const updateUserRole = async (role: 'student' | 'faculty' | 'admin' | 'superadmin', additionalData: any = {}) => {
     if (!user) return;
 
     try {
@@ -115,10 +115,15 @@ export function useUpdateUserMetadata() {
     await updateUserRole('admin', adminData);
   };
 
+  const updateSuperAdminInfo = async (superAdminData: { department: string }) => {
+    await updateUserRole('superadmin', superAdminData);
+  };
+
   return {
     updateUserRole,
     updateStudentInfo,
     updateFacultyInfo,
     updateAdminInfo,
+    updateSuperAdminInfo,
   };
 }
