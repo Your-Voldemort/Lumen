@@ -48,7 +48,11 @@ export function useClerkUser() {
 
 // Helper function to determine user role based on Clerk user metadata
 function determineUserRole(user: any): 'student' | 'faculty' | 'admin' {
-  // Check if role is set in public metadata
+  // Check if role is set in unsafe metadata (or public metadata if available)
+  if (user.unsafeMetadata?.role) {
+    return user.unsafeMetadata.role as 'student' | 'faculty' | 'admin';
+  }
+  
   if (user.publicMetadata?.role) {
     return user.publicMetadata.role as 'student' | 'faculty' | 'admin';
   }
