@@ -135,7 +135,7 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
               className="w-full h-12"
               onClick={() => {
                 setIsMenuOpen(false);
-                onLogout();
+                logout();
               }}
             >
               <LogOut className="h-4 w-4 mr-2" />
