@@ -416,6 +416,8 @@ export default function App(props: AppProps) {
               onDeleteUser={deleteUser}
             />
           );
+        } else if (currentUser?.role === 'superadmin') {
+          return <SuperAdminDashboard />;
         }
         break;
       
