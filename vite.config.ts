@@ -11,6 +11,9 @@
         '@': path.resolve(__dirname, './src'),
       },
     },
+    optimizeDeps: {
+      include: ['dompurify']
+    },
     build: {
       target: 'esnext',
       outDir: 'build',
