@@ -208,9 +208,9 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
                 </AvatarFallback>
               </Avatar>
 
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" disabled={isLoggingOut} onClick={logout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
               </Button>
             </div>
           )}
