@@ -14,7 +14,7 @@ import { StudentActivitiesView } from "./components/student/StudentActivitiesVie
 import { FacultyStudentsView } from "./components/faculty/FacultyStudentsView";
 import { FacultyReviewView } from "./components/faculty/FacultyReviewView";
 import { SuperAdminDashboard } from "./components/superadmin/SuperAdminDashboard";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Shield, Users, GraduationCap } from "lucide-react";
 
 export interface User {
