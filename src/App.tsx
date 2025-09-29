@@ -467,7 +467,6 @@ export default function App(props: AppProps) {
     <div className="min-h-screen bg-background">
       <RoleHeader 
         user={currentUser} 
-        onLogout={handleLogout}
         currentSection={currentSection}
         onNavigate={setCurrentSection}
       />
