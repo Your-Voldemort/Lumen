@@ -27,6 +27,8 @@ export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps
         return <Users className="h-4 w-4" />;
       case 'admin':
         return <Shield className="h-4 w-4" />;
+      case 'superadmin':
+        return <Crown className="h-4 w-4" />;
       default:
         return <User className="h-4 w-4" />;
     }
