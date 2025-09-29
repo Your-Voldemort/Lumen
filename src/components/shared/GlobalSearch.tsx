@@ -26,7 +26,7 @@ export interface GlobalSearchProps {
   onOpenChange: (open: boolean) => void;
   activities?: Activity[];
   users?: User[];
-  currentUserRole?: 'student' | 'faculty' | 'admin';
+  currentUserRole?: 'student' | 'faculty' | 'admin' | 'superadmin';
   onNavigate?: (path: string) => void;
   onAction?: (actionId: string, payload?: any) => void;
 }
