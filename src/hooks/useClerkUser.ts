@@ -24,11 +24,11 @@ export function useClerkUser() {
         name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.emailAddresses?.[0]?.emailAddress || 'Unknown User',
         email: user.emailAddresses?.[0]?.emailAddress || '',
         role: determineUserRole(user),
-        department: user.publicMetadata?.department as string || 'General',
+        department: (user.unsafeMetadata?.department || user.publicMetadata?.department) as string || 'General',
         // Add student-specific fields if role is student
-        ...(user.publicMetadata?.role === 'student' && {
-          year: user.publicMetadata?.year as string,
-          studentId: user.publicMetadata?.studentId as string,
+        ...((user.unsafeMetadata?.role || user.publicMetadata?.role) === 'student' && {
+          year: (user.unsafeMetadata?.year || user.publicMetadata?.year) as string,
+          studentId: (user.unsafeMetadata?.studentId || user.publicMetadata?.studentId) as string,
         }),
       };
       
