@@ -13,14 +13,15 @@ import { StudentProfileView } from "./components/student/StudentProfileView";
 import { StudentActivitiesView } from "./components/student/StudentActivitiesView";
 import { FacultyStudentsView } from "./components/faculty/FacultyStudentsView";
 import { FacultyReviewView } from "./components/faculty/FacultyReviewView";
-import { useNavigate, Link } from "react-router-dom";
+import { SuperAdminDashboard } from "./components/superadmin/SuperAdminDashboard";
+import { Link } from "react-router-dom";
 import { Shield, Users, GraduationCap } from "lucide-react";
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'faculty' | 'admin';
+  role: 'student' | 'faculty' | 'admin' | 'superadmin';
   department?: string;
   year?: string;
   studentId?: string;
@@ -78,12 +79,6 @@ export default function App(props: AppProps) {
   const setActivities = props.setActivities || setLocalActivities;
   const users = props.users !== undefined ? props.users : localUsers;
   const setUsers = props.setUsers || setLocalUsers;
-  let navigate: any = null;
-  try {
-    navigate = useNavigate();
-  } catch (error) {
-    // useNavigate is not available when not wrapped in Router
-  }
 
   // Load user and activities from localStorage on mount (only if not using props)
   useEffect(() => {
@@ -415,6 +410,8 @@ export default function App(props: AppProps) {
               onDeleteUser={deleteUser}
             />
           );
+        } else if (currentUser?.role === 'superadmin') {
+          return <SuperAdminDashboard />;
         }
         break;
       

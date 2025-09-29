@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Search, Settings, BookOpen, Trophy, BarChart3 } from "lucide-react";
+import { Bell, Search, Settings, BookOpen, Trophy, BarChart3, Crown, Shield, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { GlobalSearch } from "./shared/GlobalSearch";
@@ -50,18 +50,55 @@ export function Header({
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
+          {/* Common navigation for all users */}
           <Button variant="ghost" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Dashboard
           </Button>
-          <Button variant="ghost" className="flex items-center gap-2">
-            <Trophy className="h-4 w-4" />
-            Achievements
-          </Button>
-          <Button variant="ghost" className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4" />
-            Records
-          </Button>
+          
+          {/* Role-specific navigation */}
+          {currentUser?.role === 'superadmin' && (
+            <>
+              <Button variant="ghost" className="flex items-center gap-2 text-red-600">
+                <Crown className="h-4 w-4" />
+                Super Admin
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                User Management
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                System Control
+              </Button>
+            </>
+          )}
+          
+          {currentUser?.role === 'admin' && (
+            <>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Manage Users
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
+                Reports
+              </Button>
+            </>
+          )}
+          
+          {(currentUser?.role === 'student' || currentUser?.role === 'faculty') && (
+            <>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
+                Achievements
+              </Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Records
+              </Button>
+            </>
+          )}
         </nav>
 
         <div className="flex items-center gap-4">

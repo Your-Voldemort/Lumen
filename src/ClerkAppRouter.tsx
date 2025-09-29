@@ -55,7 +55,7 @@ export default function ClerkAppRouter() {
   useEffect(() => {
     if (isSignedIn && user) {
       // Check if user has completed role setup
-      const hasRole = user.role && ['student', 'faculty', 'admin'].includes(user.role);
+      const hasRole = user.role && ['student', 'faculty', 'admin', 'superadmin'].includes(user.role);
       const hasBasicInfo = user.department;
       
       if (!hasRole || !hasBasicInfo) {

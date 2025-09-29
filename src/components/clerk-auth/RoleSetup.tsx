@@ -6,14 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateUserMetadata } from '@/hooks/useClerkUser';
 import { toast } from 'sonner';
-import { User, Users, Shield, GraduationCap } from 'lucide-react';
+import { User, Users, Shield, GraduationCap, Crown } from 'lucide-react';
 
 interface RoleSetupProps {
   onComplete: () => void;
 }
 
 export function RoleSetup({ onComplete }: RoleSetupProps) {
-  const [selectedRole, setSelectedRole] = useState<'student' | 'faculty' | 'admin' | ''>('');
+  const [selectedRole, setSelectedRole] = useState<'student' | 'faculty' | 'admin' | 'superadmin' | ''>('');
   const [formData, setFormData] = useState({
     department: '',
     year: '',
@@ -21,7 +21,7 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const { updateStudentInfo, updateFacultyInfo, updateAdminInfo } = useUpdateUserMetadata();
+  const { updateStudentInfo, updateFacultyInfo, updateAdminInfo, updateSuperAdminInfo } = useUpdateUserMetadata();
 
   const handleSubmit = async () => {
     if (!selectedRole) {
@@ -57,6 +57,11 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
           break;
         case 'admin':
           await updateAdminInfo({
+            department: formData.department,
+          });
+          break;
+        case 'superadmin':
+          await updateSuperAdminInfo({
             department: formData.department,
           });
           break;
@@ -143,6 +148,23 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
                   <div>
                     <h3 className="font-semibold">Administrator</h3>
                     <p className="text-sm text-muted-foreground">Manage users and generate reports</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setSelectedRole('superadmin')}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  selectedRole === 'superadmin'
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Crown className="h-6 w-6 text-red-600" />
+                  <div>
+                    <h3 className="font-semibold">Super Administrator</h3>
+                    <p className="text-sm text-muted-foreground">Master access to all system functions</p>
                   </div>
                 </div>
               </div>
