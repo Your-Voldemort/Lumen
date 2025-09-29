@@ -3,8 +3,9 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { LogOut, GraduationCap, User, Users, Shield, Menu, Home, BarChart3, FileText, Settings } from "lucide-react";
+import { LogOut, GraduationCap, User, Users, Shield, Menu, Home, BarChart3, FileText, Settings, Crown } from "lucide-react";
 import { useIsMobile } from "../ui/use-mobile";
+import { useLogout } from "../../hooks/useLogout";
 import type { User as UserType, NavigationSection } from "../../App";
 
 interface RoleHeaderProps {
