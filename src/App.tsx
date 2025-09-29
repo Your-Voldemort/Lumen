@@ -385,7 +385,6 @@ export default function App(props: AppProps) {
         } else if (currentUser?.role === 'faculty') {
           return (
             <FacultyDashboard 
-              user={currentUser}
               activities={activities}
               onUpdateActivityStatus={updateActivityStatus}
             />
