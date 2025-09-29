@@ -5,7 +5,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'faculty' | 'admin';
+  role: 'student' | 'faculty' | 'admin' | 'superadmin';
   department?: string;
   year?: string;
   studentId?: string;
@@ -47,18 +47,25 @@ export function useClerkUser() {
 }
 
 // Helper function to determine user role based on Clerk user metadata
-function determineUserRole(user: any): 'student' | 'faculty' | 'admin' {
+function determineUserRole(user: any): 'student' | 'faculty' | 'admin' | 'superadmin' {
   // Check if role is set in unsafe metadata (or public metadata if available)
   if (user.unsafeMetadata?.role) {
-    return user.unsafeMetadata.role as 'student' | 'faculty' | 'admin';
+    return user.unsafeMetadata.role as 'student' | 'faculty' | 'admin' | 'superadmin';
   }
   
   if (user.publicMetadata?.role) {
-    return user.publicMetadata.role as 'student' | 'faculty' | 'admin';
+    return user.publicMetadata.role as 'student' | 'faculty' | 'admin' | 'superadmin';
   }
 
   // Check email domain for role determination
   const email = user.emailAddresses?.[0]?.emailAddress || '';
+  
+  // SuperAdmin emails (very specific patterns for security)
+  if (email.includes('superadmin@') || email.includes('@superadmin.') || 
+      email.includes('master@') || email.includes('@master.') ||
+      email.includes('root@') || email.includes('@root.')) {
+    return 'superadmin';
+  }
   
   // Admin emails
   if (email.includes('admin@') || email.includes('@admin.')) {
