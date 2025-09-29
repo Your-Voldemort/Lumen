@@ -20,7 +20,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'faculty' | 'admin';
+  role: 'student' | 'faculty' | 'admin' | 'superadmin';
   department?: string;
   year?: string;
   studentId?: string;
