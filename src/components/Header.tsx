@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Bell, Search, Settings, BookOpen, Trophy, BarChart3 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { GlobalSearch } from "./shared/GlobalSearch";
+import { ClerkAuthButton } from "./clerk-auth/ClerkAuthButton";
 import type { User, Activity } from "../App";
 
 interface HeaderProps {
@@ -101,12 +101,8 @@ export function Header({
             <Settings className="h-5 w-5" />
           </Button>
 
-          <Avatar>
-            <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" />
-            <AvatarFallback>
-              {currentUser ? currentUser.name.split(' ').map(n => n[0]).join('') : 'JS'}
-            </AvatarFallback>
-          </Avatar>
+          {/* Clerk Authentication UI */}
+          <ClerkAuthButton />
         </div>
       </div>
 
