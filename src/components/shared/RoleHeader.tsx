@@ -10,14 +10,14 @@ import type { User as UserType, NavigationSection } from "../../App";
 
 interface RoleHeaderProps {
   user: UserType;
-  onLogout: () => void;
   currentSection: NavigationSection;
   onNavigate: (section: NavigationSection) => void;
 }
 
-export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleHeaderProps) {
+export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { logout } = useLogout();
 
   const getRoleIcon = (role: string) => {
     switch (role) {
