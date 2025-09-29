@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import App from "./App";
-import { ClerkSignInPage } from "./components/clerk-auth/ClerkSignInPage";
-import { ClerkSignUpPage } from "./components/clerk-auth/ClerkSignUpPage";
+import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
+import { RoleSpecificSignInPage } from "./components/auth/RoleSpecificSignInPage";
+import { RoleSpecificSignUpPage } from "./components/auth/RoleSpecificSignUpPage";
 import { RoleSetup } from "./components/clerk-auth/RoleSetup";
 import { ProtectedRoute } from "./components/clerk-auth/ProtectedRoute";
 import { useClerkUser } from "./hooks/useClerkUser";
@@ -156,17 +157,72 @@ export default function ClerkAppRouter() {
   return (
     <Router>
       <Routes>
-        {/* Public authentication routes */}
+        {/* Role Selection Landing Page */}
+        <Route 
+          path="/" 
+          element={
+            isSignedIn ? (
+              <ProtectedRoute redirectTo="/select-role">
+                {needsRoleSetup ? (
+                  <Navigate to="/setup" replace />
+                ) : (
+                  <>
+                    <App 
+                      currentUser={user}
+                      setCurrentUser={() => {}} // Not needed with Clerk
+                      activities={activities}
+                      setActivities={setActivities}
+                      users={users}
+                      setUsers={setUsers}
+                      onLogout={() => {}} // Handled by Clerk
+                    />
+                    <Toaster position="bottom-right" />
+                  </>
+                )}
+              </ProtectedRoute>
+            ) : (
+              <Navigate to="/select-role" replace />
+            )
+          } 
+        />
+
+        {/* Role Selection Page */}
+        <Route 
+          path="/select-role" 
+          element={
+            isSignedIn ? <Navigate to="/" replace /> : <RoleSelectionPage />
+          } 
+        />
+
+        {/* Role-specific Sign In routes */}
+        <Route 
+          path="/sign-in/:role" 
+          element={
+            isSignedIn ? <Navigate to="/" replace /> : <RoleSpecificSignInPage />
+          } 
+        />
+        
+        {/* Legacy sign-in route - redirect to role selection */}
         <Route 
           path="/sign-in" 
           element={
-            isSignedIn ? <Navigate to="/" replace /> : <ClerkSignInPage />
+            isSignedIn ? <Navigate to="/" replace /> : <Navigate to="/select-role" replace />
           } 
         />
+
+        {/* Role-specific Sign Up routes */}
+        <Route 
+          path="/sign-up/:role" 
+          element={
+            isSignedIn ? <Navigate to="/" replace /> : <RoleSpecificSignUpPage />
+          } 
+        />
+        
+        {/* Legacy sign-up route - redirect to role selection */}
         <Route 
           path="/sign-up" 
           element={
-            isSignedIn ? <Navigate to="/" replace /> : <ClerkSignUpPage />
+            isSignedIn ? <Navigate to="/" replace /> : <Navigate to="/select-role" replace />
           } 
         />
 
@@ -174,7 +230,7 @@ export default function ClerkAppRouter() {
         <Route 
           path="/setup" 
           element={
-            <ProtectedRoute redirectTo="/sign-in">
+            <ProtectedRoute redirectTo="/select-role">
               {needsRoleSetup ? (
                 <RoleSetup onComplete={handleRoleSetupComplete} />
               ) : (
@@ -184,38 +240,28 @@ export default function ClerkAppRouter() {
           } 
         />
 
-        {/* Main application route */}
+        {/* Legacy direct access routes - redirect to role-specific sign-in */}
         <Route 
-          path="/" 
+          path="/student-access" 
           element={
-            <ProtectedRoute redirectTo="/sign-in">
-              {needsRoleSetup ? (
-                <Navigate to="/setup" replace />
-              ) : (
-                <>
-                  <App 
-                    currentUser={user}
-                    setCurrentUser={() => {}} // Not needed with Clerk
-                    activities={activities}
-                    setActivities={setActivities}
-                    users={users}
-                    setUsers={setUsers}
-                    onLogout={() => {}} // Handled by Clerk
-                  />
-                  <Toaster position="bottom-right" />
-                </>
-              )}
-            </ProtectedRoute>
+            isSignedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in/student" replace />
+          } 
+        />
+        <Route 
+          path="/faculty-access" 
+          element={
+            isSignedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in/faculty" replace />
+          } 
+        />
+        <Route 
+          path="/admin-access" 
+          element={
+            isSignedIn ? <Navigate to="/" replace /> : <Navigate to="/sign-in/admin" replace />
           } 
         />
         
-        {/* Legacy routes - redirect to main app or sign-in */}
-        <Route path="/admin-access" element={<Navigate to="/" replace />} />
-        <Route path="/faculty-access" element={<Navigate to="/" replace />} />
-        <Route path="/student-access" element={<Navigate to="/" replace />} />
-        
-        {/* Default redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Default redirect to role selection */}
+        <Route path="*" element={<Navigate to="/select-role" replace />} />
       </Routes>
     </Router>
   );
