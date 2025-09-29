@@ -60,6 +60,11 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
             department: formData.department,
           });
           break;
+        case 'superadmin':
+          await updateSuperAdminInfo({
+            department: formData.department,
+          });
+          break;
       }
 
       toast.success('Profile setup completed successfully!');
