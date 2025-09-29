@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, Search, Settings, BookOpen, Trophy, BarChart3 } from "lucide-react";
+import { Bell, Search, Settings, BookOpen, Trophy, BarChart3, Crown, Shield, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { GlobalSearch } from "./shared/GlobalSearch";
