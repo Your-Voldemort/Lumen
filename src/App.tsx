@@ -79,12 +79,6 @@ export default function App(props: AppProps) {
   const setActivities = props.setActivities || setLocalActivities;
   const users = props.users !== undefined ? props.users : localUsers;
   const setUsers = props.setUsers || setLocalUsers;
-  let navigate: any = null;
-  try {
-    navigate = useNavigate();
-  } catch (error) {
-    // useNavigate is not available when not wrapped in Router
-  }
 
   // Load user and activities from localStorage on mount (only if not using props)
   useEffect(() => {
