@@ -102,12 +102,8 @@ export function Header({
             <Settings className="h-5 w-5" />
           </Button>
 
-          <Avatar>
-            <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" />
-            <AvatarFallback>
-              {currentUser ? currentUser.name.split(' ').map(n => n[0]).join('') : 'JS'}
-            </AvatarFallback>
-          </Avatar>
+          {/* Clerk Authentication UI */}
+          <ClerkAuthButton />
         </div>
       </div>
 
