@@ -3,20 +3,21 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
-import { LogOut, GraduationCap, User, Users, Shield, Menu, Home, BarChart3, FileText, Settings } from "lucide-react";
+import { LogOut, GraduationCap, User, Users, Shield, Menu, Home, BarChart3, FileText, Settings, Crown } from "lucide-react";
 import { useIsMobile } from "../ui/use-mobile";
+import { useLogout } from "../../hooks/useLogout";
 import type { User as UserType, NavigationSection } from "../../App";
 
 interface RoleHeaderProps {
   user: UserType;
-  onLogout: () => void;
   currentSection: NavigationSection;
   onNavigate: (section: NavigationSection) => void;
 }
 
-export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleHeaderProps) {
+export function RoleHeader({ user, currentSection, onNavigate }: RoleHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { logout, isLoggingOut } = useLogout();
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -26,6 +27,8 @@ export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleH
         return <Users className="h-4 w-4" />;
       case 'admin':
         return <Shield className="h-4 w-4" />;
+      case 'superadmin':
+        return <Crown className="h-4 w-4" />;
       default:
         return <User className="h-4 w-4" />;
     }
@@ -39,6 +42,8 @@ export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleH
         return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
       case 'admin':
         return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+      case 'superadmin':
+        return 'bg-red-100 text-red-800 hover:bg-red-200';
       default:
         return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
     }
@@ -132,13 +137,14 @@ export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleH
             <Button 
               variant="outline" 
               className="w-full h-12"
+              disabled={isLoggingOut}
               onClick={() => {
                 setIsMenuOpen(false);
-                onLogout();
+                logout();
               }}
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              {isLoggingOut ? 'Logging out...' : 'Logout'}
             </Button>
           </div>
         </div>
@@ -202,9 +208,9 @@ export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleH
                 </AvatarFallback>
               </Avatar>
 
-              <Button variant="outline" size="sm" onClick={onLogout}>
+              <Button variant="outline" size="sm" disabled={isLoggingOut} onClick={logout}>
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
               </Button>
             </div>
           )}
@@ -217,9 +223,9 @@ export function RoleHeader({ user, onLogout, currentSection, onNavigate }: RoleH
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="sm" onClick={onLogout}>
+              <Button variant="ghost" size="sm" disabled={isLoggingOut} onClick={logout}>
                 <LogOut className="h-4 w-4" />
-                <span className="sr-only">Logout</span>
+                <span className="sr-only">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
               </Button>
             </div>
           )}
