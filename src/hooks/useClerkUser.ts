@@ -78,9 +78,10 @@ export function useUpdateUserMetadata() {
     if (!user) return;
 
     try {
+      // Update using unsafeMetadata for now, or use a backend API to update publicMetadata
       await user.update({
-        publicMetadata: {
-          ...user.publicMetadata,
+        unsafeMetadata: {
+          ...user.unsafeMetadata,
           role,
           ...additionalData,
         },
