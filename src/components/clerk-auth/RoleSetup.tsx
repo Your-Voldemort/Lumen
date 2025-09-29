@@ -6,14 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateUserMetadata } from '@/hooks/useClerkUser';
 import { toast } from 'sonner';
-import { User, Users, Shield, GraduationCap } from 'lucide-react';
+import { User, Users, Shield, GraduationCap, Crown } from 'lucide-react';
 
 interface RoleSetupProps {
   onComplete: () => void;
 }
 
 export function RoleSetup({ onComplete }: RoleSetupProps) {
-  const [selectedRole, setSelectedRole] = useState<'student' | 'faculty' | 'admin' | ''>('');
+  const [selectedRole, setSelectedRole] = useState<'student' | 'faculty' | 'admin' | 'superadmin' | ''>('');
   const [formData, setFormData] = useState({
     department: '',
     year: '',
@@ -21,7 +21,7 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const { updateStudentInfo, updateFacultyInfo, updateAdminInfo } = useUpdateUserMetadata();
+  const { updateStudentInfo, updateFacultyInfo, updateAdminInfo, updateSuperAdminInfo } = useUpdateUserMetadata();
 
   const handleSubmit = async () => {
     if (!selectedRole) {
