@@ -132,8 +132,7 @@ export default function ClerkAppRouter() {
   };
 
   const handleRoleSetupComplete = () => {
-    setNeedsRoleSetup(false);
-    // Optionally refresh the page to reload user data
+    // No longer needed - useSupabaseUser handles this automatically
     window.location.reload();
   };
 
