@@ -222,8 +222,8 @@ export default function ClerkAppRouter() {
           path="/setup" 
           element={
             <ProtectedRoute redirectTo="/select-role">
-              {needsRoleSetup ? (
-                <RoleSetup onComplete={handleRoleSetupComplete} />
+              {needsProfileSetup ? (
+                <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />
               ) : (
                 <Navigate to="/" replace />
               )}
