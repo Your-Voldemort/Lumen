@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,16 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const { updateStudentInfo, updateFacultyInfo, updateAdminInfo, updateSuperAdminInfo } = useUpdateUserMetadata();
+
+  // Load pre-selected role from localStorage
+  useEffect(() => {
+    const storedRole = localStorage.getItem('selectedRole');
+    if (storedRole && ['student', 'faculty', 'admin'].includes(storedRole)) {
+      setSelectedRole(storedRole as 'student' | 'faculty' | 'admin');
+      // Clear the stored role after using it
+      localStorage.removeItem('selectedRole');
+    }
+  }, []);
 
   const handleSubmit = async () => {
     if (!selectedRole) {

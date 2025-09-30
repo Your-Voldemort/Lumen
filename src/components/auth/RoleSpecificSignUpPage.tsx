@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GraduationCap, Users, Shield, ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface RoleConfig {
   title: string;
@@ -71,6 +72,13 @@ export function RoleSpecificSignUpPage() {
   const currentRole = role && roleConfigs[role] ? role : 'student';
   const config = roleConfigs[currentRole];
   const IconComponent = config.icon;
+
+  // Store the selected role in localStorage for role setup
+  useEffect(() => {
+    if (currentRole) {
+      localStorage.setItem('selectedRole', currentRole);
+    }
+  }, [currentRole]);
 
   const handleBackToSelection = () => {
     navigate('/');
