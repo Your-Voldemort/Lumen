@@ -13,10 +13,9 @@ import type { Activity } from "./App";
 
 export default function ClerkAppRouter() {
   const { isLoaded, isSignedIn } = useUser();
-  const { user } = useClerkUser();
+  const { user, needsProfileSetup } = useSupabaseUser();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [needsRoleSetup, setNeedsRoleSetup] = useState(false);
 
   // Load data from localStorage on mount
   useEffect(() => {
