@@ -154,14 +154,13 @@ export default function ClerkAppRouter() {
           element={
             isSignedIn ? (
               <ProtectedRoute redirectTo="/select-role">
-                {needsRoleSetup ? (
+                {needsProfileSetup ? (
                   <Navigate to="/setup" replace />
                 ) : (
                   <>
-                    <UserDebug />
                     <App 
                       currentUser={user}
-                      setCurrentUser={() => {}} // Not needed with Clerk
+                      setCurrentUser={() => {}} // Not needed with Supabase
                       activities={activities}
                       setActivities={setActivities}
                       users={users}
