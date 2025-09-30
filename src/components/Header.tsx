@@ -138,8 +138,8 @@ export function Header({
             <Settings className="h-5 w-5" />
           </Button>
 
-          {/* Clerk Authentication UI */}
-          <ClerkAuthButton />
+          {/* Supabase + Clerk Authentication UI */}
+          <SupabaseClerkAuthButton />
         </div>
       </div>
 
