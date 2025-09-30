@@ -54,6 +54,13 @@ export function RoleSpecificSignInPage() {
   const config = roleConfigs[currentRole];
   const IconComponent = config.icon;
 
+  // Store the selected role in localStorage for role setup
+  useEffect(() => {
+    if (currentRole) {
+      localStorage.setItem('selectedRole', currentRole);
+    }
+  }, [currentRole]);
+
   const handleBackToSelection = () => {
     navigate('/');
   };
