@@ -4,19 +4,18 @@ import App from "./App";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
 import { RoleSpecificSignInPage } from "./components/auth/RoleSpecificSignInPage";
 import { RoleSpecificSignUpPage } from "./components/auth/RoleSpecificSignUpPage";
-import { RoleSetup } from "./components/clerk-auth/RoleSetup";
+import { SupabaseRoleSetup } from "./components/supabase-auth/SupabaseRoleSetup";
 import { ProtectedRoute } from "./components/clerk-auth/ProtectedRoute";
-import { useClerkUser } from "./hooks/useClerkUser";
+import { useSupabaseUser } from "./hooks/useSupabaseUser";
 import { useState, useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import type { Activity } from "./App";
 
 export default function ClerkAppRouter() {
   const { isLoaded, isSignedIn } = useUser();
-  const { user } = useClerkUser();
+  const { user, needsProfileSetup } = useSupabaseUser();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [needsRoleSetup, setNeedsRoleSetup] = useState(false);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -55,15 +54,8 @@ export default function ClerkAppRouter() {
   // Check if user needs role setup
   useEffect(() => {
     if (isSignedIn && user) {
-      // Check if user has completed role setup
-      const hasRole = user.role && ['student', 'faculty', 'admin', 'superadmin'].includes(user.role);
-      const hasBasicInfo = user.department;
-      
-      if (!hasRole || !hasBasicInfo) {
-        setNeedsRoleSetup(true);
-      } else {
-        setNeedsRoleSetup(false);
-      }
+      // User profile is loaded from Supabase, no additional checks needed
+      // needsProfileSetup is handled by the useSupabaseUser hook
     }
   }, [isSignedIn, user]);
 
@@ -140,8 +132,7 @@ export default function ClerkAppRouter() {
   };
 
   const handleRoleSetupComplete = () => {
-    setNeedsRoleSetup(false);
-    // Optionally refresh the page to reload user data
+    // No longer needed - useSupabaseUser handles this automatically
     window.location.reload();
   };
 
@@ -163,13 +154,13 @@ export default function ClerkAppRouter() {
           element={
             isSignedIn ? (
               <ProtectedRoute redirectTo="/select-role">
-                {needsRoleSetup ? (
+                {needsProfileSetup ? (
                   <Navigate to="/setup" replace />
                 ) : (
                   <>
                     <App 
                       currentUser={user}
-                      setCurrentUser={() => {}} // Not needed with Clerk
+                      setCurrentUser={() => {}} // Not needed with Supabase
                       activities={activities}
                       setActivities={setActivities}
                       users={users}
@@ -231,8 +222,8 @@ export default function ClerkAppRouter() {
           path="/setup" 
           element={
             <ProtectedRoute redirectTo="/select-role">
-              {needsRoleSetup ? (
-                <RoleSetup onComplete={handleRoleSetupComplete} />
+              {needsProfileSetup ? (
+                <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />
               ) : (
                 <Navigate to="/" replace />
               )}
