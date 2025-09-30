@@ -4,13 +4,12 @@ import App from "./App";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
 import { RoleSpecificSignInPage } from "./components/auth/RoleSpecificSignInPage";
 import { RoleSpecificSignUpPage } from "./components/auth/RoleSpecificSignUpPage";
-import { RoleSetup } from "./components/clerk-auth/RoleSetup";
+import { SupabaseRoleSetup } from "./components/supabase-auth/SupabaseRoleSetup";
 import { ProtectedRoute } from "./components/clerk-auth/ProtectedRoute";
-import { useClerkUser } from "./hooks/useClerkUser";
+import { useSupabaseUser } from "./hooks/useSupabaseUser";
 import { useState, useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import type { Activity } from "./App";
-import { UserDebug } from "./components/debug/UserDebug";
 
 export default function ClerkAppRouter() {
   const { isLoaded, isSignedIn } = useUser();
