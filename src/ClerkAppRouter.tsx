@@ -10,6 +10,7 @@ import { useClerkUser } from "./hooks/useClerkUser";
 import { useState, useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import type { Activity } from "./App";
+import { UserDebug } from "./components/debug/UserDebug";
 
 export default function ClerkAppRouter() {
   const { isLoaded, isSignedIn } = useUser();
