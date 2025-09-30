@@ -168,6 +168,7 @@ export default function ClerkAppRouter() {
                   <Navigate to="/setup" replace />
                 ) : (
                   <>
+                    <UserDebug />
                     <App 
                       currentUser={user}
                       setCurrentUser={() => {}} // Not needed with Clerk
