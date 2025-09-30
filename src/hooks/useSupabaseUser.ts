@@ -93,8 +93,8 @@ export function useSupabaseUser() {
         last_name: profileData.lastName,
         role: profileData.role,
         department: profileData.department,
-        year: profileData.year || null,
-        student_id: profileData.studentId || null,
+        year: profileData.year || undefined,
+        student_id: profileData.studentId || undefined,
       };
 
       const { data, error } = await supabase
