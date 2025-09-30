@@ -54,15 +54,8 @@ export default function ClerkAppRouter() {
   // Check if user needs role setup
   useEffect(() => {
     if (isSignedIn && user) {
-      // Check if user has completed role setup
-      const hasRole = user.role && ['student', 'faculty', 'admin', 'superadmin'].includes(user.role);
-      const hasBasicInfo = user.department;
-      
-      if (!hasRole || !hasBasicInfo) {
-        setNeedsRoleSetup(true);
-      } else {
-        setNeedsRoleSetup(false);
-      }
+      // User profile is loaded from Supabase, no additional checks needed
+      // needsProfileSetup is handled by the useSupabaseUser hook
     }
   }, [isSignedIn, user]);
 
