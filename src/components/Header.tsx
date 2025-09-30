@@ -3,7 +3,7 @@ import { Bell, Search, Settings, BookOpen, Trophy, BarChart3, Crown, Shield, Use
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { GlobalSearch } from "./shared/GlobalSearch";
-import { ClerkAuthButton } from "./clerk-auth/ClerkAuthButton";
+import { SupabaseClerkAuthButton } from "./supabase-auth/SupabaseClerkAuthButton";
 import type { User, Activity } from "../App";
 
 interface HeaderProps {
