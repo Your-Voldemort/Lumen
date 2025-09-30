@@ -23,6 +23,16 @@ export function RoleSetup({ onComplete }: RoleSetupProps) {
 
   const { updateStudentInfo, updateFacultyInfo, updateAdminInfo, updateSuperAdminInfo } = useUpdateUserMetadata();
 
+  // Load pre-selected role from localStorage
+  useEffect(() => {
+    const storedRole = localStorage.getItem('selectedRole');
+    if (storedRole && ['student', 'faculty', 'admin'].includes(storedRole)) {
+      setSelectedRole(storedRole as 'student' | 'faculty' | 'admin');
+      // Clear the stored role after using it
+      localStorage.removeItem('selectedRole');
+    }
+  }, []);
+
   const handleSubmit = async () => {
     if (!selectedRole) {
       toast.error('Please select a role');
