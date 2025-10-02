@@ -22,6 +22,12 @@ The project was using `date-fns@4.1.0` (the latest version) while `react-day-pic
    - **To**: `^9.11.0`
    - **File**: `package.json` (line 46)
 
+2. **Updated Calendar component for v9 API**
+   - **File**: `src/components/ui/calendar.tsx`
+   - **Change**: Replaced deprecated `IconLeft` and `IconRight` with `Chevron` component
+   - **Reason**: react-day-picker v9 changed the components API
+   - **Impact**: Custom icon rendering now uses single `Chevron` component with `orientation` prop
+
 ### Why This Fix Works
 - `react-day-picker@9.11.0` has `date-fns@^4.1.0` as a dependency (not peer dependency)
 - This matches exactly with the project's `date-fns@4.1.0` requirement
@@ -45,10 +51,11 @@ lumen-hackathon-website@0.1.0
 ## Impact Assessment
 
 ### Breaking Changes
-The upgrade from react-day-picker v8 to v9 may have API changes. However:
-- The component is only used in `src/components/ui/calendar.tsx`
-- Basic usage with `DayPicker` component and class names
-- No breaking changes detected in build or runtime
+The upgrade from react-day-picker v8 to v9 included API changes:
+- **Components API**: `IconLeft` and `IconRight` replaced with `Chevron` component
+- **Fixed in**: `src/components/ui/calendar.tsx`
+- **Change**: Chevron component now receives `orientation` prop ("left" or "right")
+- **Result**: All functionality preserved with updated API
 
 ### Components Affected
 - `src/components/ui/calendar.tsx` - Uses `DayPicker` component from react-day-picker
