@@ -3,6 +3,27 @@ import { useUser } from '@clerk/clerk-react';
 import { supabase, type DatabaseUser } from '../lib/supabase';
 import { toast } from 'sonner';
 
+// Debug function to check Supabase connection
+const testSupabaseConnection = async () => {
+  try {
+    console.log('Testing Supabase connection...');
+    const { data, error } = await supabase
+      .from('users')
+      .select('count', { count: 'exact', head: true });
+    
+    if (error) {
+      console.error('Supabase connection test failed:', error);
+      return false;
+    }
+    
+    console.log('Supabase connection successful, user count:', data);
+    return true;
+  } catch (err) {
+    console.error('Supabase connection error:', err);
+    return false;
+  }
+};
+
 export interface AppUser {
   id: string;
   name: string;
@@ -19,6 +40,20 @@ export function useSupabaseUser() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Check environment variables
+  useEffect(() => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey || 
+        supabaseUrl === 'your_supabase_project_url_here' ||
+        supabaseKey === 'your_supabase_anon_key_here') {
+      setError('Supabase is not configured. Please set up your environment variables.');
+      setLoading(false);
+      toast.error('Database configuration missing. Please contact administrator.');
+    }
+  }, []);
+
   // Load user from Supabase
   useEffect(() => {
     async function loadUser() {
@@ -32,15 +67,22 @@ export function useSupabaseUser() {
         setLoading(true);
         setError(null);
 
+        console.log('Loading user for Clerk ID:', clerkUser.id);
+        
+        // Test Supabase connection first
+        await testSupabaseConnection();
+
         // Check if user exists in Supabase
         const { data: dbUser, error: fetchError } = await supabase
           .from('users')
-          .select('*')
+          .select('id, email, first_name, last_name, role, department, year, student_id, created_at, updated_at')
           .eq('id', clerkUser.id)
-          .single();
+          .maybeSingle();
 
-        if (fetchError && fetchError.code !== 'PGRST116') {
-          // PGRST116 is "not found", which is expected for new users
+        console.log('Supabase query result:', { dbUser, fetchError });
+
+        if (fetchError) {
+          console.error('Supabase fetch error:', fetchError);
           throw fetchError;
         }
 
@@ -97,13 +139,20 @@ export function useSupabaseUser() {
         student_id: profileData.studentId || undefined,
       };
 
+      console.log('Creating user profile:', dbUser);
+
       const { data, error } = await supabase
         .from('users')
         .insert([dbUser])
-        .select()
+        .select('id, email, first_name, last_name, role, department, year, student_id, created_at, updated_at')
         .single();
 
-      if (error) throw error;
+      console.log('Insert result:', { data, error });
+
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
 
       // Update local state
       const mappedUser: AppUser = {

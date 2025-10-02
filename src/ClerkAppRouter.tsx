@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import App from "./App";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
@@ -7,6 +7,7 @@ import { RoleSpecificSignUpPage } from "./components/auth/RoleSpecificSignUpPage
 import { SupabaseRoleSetup } from "./components/supabase-auth/SupabaseRoleSetup";
 import { ProtectedRoute } from "./components/clerk-auth/ProtectedRoute";
 import { useSupabaseUser } from "./hooks/useSupabaseUser";
+import { QuickSupabaseFix } from "./components/debug/QuickSupabaseFix";
 import { useState, useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import type { Activity } from "./App";
@@ -131,9 +132,21 @@ export default function ClerkAppRouter() {
     }
   };
 
-  const handleRoleSetupComplete = () => {
-    // No longer needed - useSupabaseUser handles this automatically
-    window.location.reload();
+  // Setup completion wrapper component to handle navigation properly
+  const SetupWrapper = () => {
+    const navigate = useNavigate();
+    
+    const handleRoleSetupComplete = () => {
+      console.log('Role setup completed, navigating to dashboard');
+      // Navigate to dashboard instead of reloading
+      navigate('/', { replace: true });
+    };
+
+    return needsProfileSetup ? (
+      <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />
+    ) : (
+      <Navigate to="/" replace />
+    );
   };
 
   // Show loading while Clerk is initializing
@@ -222,11 +235,7 @@ export default function ClerkAppRouter() {
           path="/setup" 
           element={
             <ProtectedRoute redirectTo="/select-role">
-              {needsProfileSetup ? (
-                <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />
-              ) : (
-                <Navigate to="/" replace />
-              )}
+              <SetupWrapper />
             </ProtectedRoute>
           } 
         />
@@ -251,6 +260,16 @@ export default function ClerkAppRouter() {
           } 
         />
         
+        {/* Debug route for Supabase issues */}
+        <Route 
+          path="/debug" 
+          element={
+            <ProtectedRoute redirectTo="/select-role">
+              <QuickSupabaseFix />
+            </ProtectedRoute>
+          } 
+        />
+
         {/* Default redirect to role selection */}
         <Route path="*" element={<Navigate to="/select-role" replace />} />
       </Routes>
