@@ -4,7 +4,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-Lumen is a comprehensive student achievement tracking and management platform built with React and TypeScript. It provides a role-based system for students, faculty, and administrators to manage academic activities, track progress, and generate reports.
+Lumen is a comprehensive student achievement tracking and management platform built with React and TypeScript. It provides a role-based system for students, faculty, administrators, and super administrators to manage academic activities, track progress, and generate reports. The platform uses Clerk for authentication and Supabase for database management.
 
 ## Development Commands
 
@@ -21,37 +21,42 @@ npm run build
 ```
 
 ### Testing
-No test runner is currently configured. To add testing:
+Tests are configured using Vitest and Testing Library:
 ```bash
-# Install testing dependencies
-npm install --save-dev vitest @testing-library/react @testing-library/jest-dom
+# Run tests
+npm run test
 
-# Add test script to package.json
-# "test": "vitest"
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
 ```
 
 ## Architecture Overview
 
 ### Application Structure
-The application follows a role-based architecture with three distinct user types, each with dedicated components and workflows:
+The application follows a role-based architecture with four distinct user types, each with dedicated components and workflows:
 
-1. **Entry Point**: `src/main.tsx` bootstraps the React app with `App.tsx` as the root component
-2. **Authentication Flow**: Login via `LoginForm` component determines user role and routes to appropriate dashboard
-3. **State Management**: Local state with localStorage persistence for users, activities, and current session
-4. **Routing**: Section-based navigation using state rather than URL routing (managed by `currentSection` state)
+1. **Entry Point**: `src/main.tsx` bootstraps the React app with `ClerkAppRouter.tsx` handling authentication routing
+2. **Authentication Flow**: Clerk handles authentication, users select roles during signup, and are routed to appropriate dashboards
+3. **State Management**: Supabase for primary data storage with localStorage backup for offline development
+4. **Routing**: React Router for navigation with protected routes based on authentication status
 
 ### Core Data Flow
-- **User Sessions**: Managed in `App.tsx` with `currentUser` state, persisted to localStorage
-- **Activities**: Central activity data (`Activity[]`) flows from App.tsx to role-specific components
+- **User Sessions**: Managed by Clerk with role information stored in Supabase user profiles
+- **Activities**: Activity data stored in Supabase with Row-Level Security policies
 - **Review Workflow**: Activities move through states: `pending` → `approved`/`rejected` with faculty review
-- **Data Persistence**: All state changes are synced to localStorage for offline capability
+- **Data Persistence**: Primary storage in Supabase, with localStorage fallback for offline development
 
 ### Role-Based Component Architecture
 ```
-App.tsx (orchestrator)
-├── Student Role → StudentDashboard → Profile, Activities, Stats
-├── Faculty Role → FacultyDashboard → Review, Students, Analytics
-└── Admin Role → AdminDashboard → UserManagement, Reports, SystemAnalytics
+ClerkAppRouter.tsx (authentication routing)
+└── App.tsx (orchestrator)
+    ├── Student Role → StudentDashboard → Profile, Activities, Stats
+    ├── Faculty Role → FacultyDashboard → Review, Students, Analytics
+    ├── Admin Role → AdminDashboard → UserManagement, Reports, SystemAnalytics
+    └── Super Admin Role → SuperAdminDashboard → System Controls, Advanced Management
 ```
 
 ### Key Technical Decisions
@@ -59,7 +64,9 @@ App.tsx (orchestrator)
 - **Build Tool**: Vite for fast development and optimized production builds
 - **Type Safety**: TypeScript strict mode enforced throughout
 - **PDF Handling**: Built-in PDF viewer component for document management
-- **No External Backend**: localStorage serves as the data persistence layer
+- **Authentication**: Clerk for secure user authentication and session management
+- **Database**: Supabase (PostgreSQL) as primary datastore with Row-Level Security
+- **Offline Support**: localStorage serves as backup for offline development
 
 ## Code Guidelines
 
@@ -86,18 +93,24 @@ App.tsx (orchestrator)
 - localStorage for persistence with error handling
 - Unidirectional data flow from parent to child
 
-## Default User Credentials
+## Authentication Setup
 
-For development and testing:
-- **Student**: `john.smith@university.edu`
-- **Faculty**: `emily.chen@university.edu`  
-- **Admin**: `michael.johnson@university.edu`
+The application uses Clerk for authentication. Users need to:
+1. Sign up with their email address
+2. Complete the Clerk authentication flow
+3. Select their role (Student, Faculty, Admin, or Super Administrator)
+4. Complete profile setup with department information
+
+See [CLERK_SETUP.md](CLERK_SETUP.md) and [SUPABASE_SETUP_GUIDE.md](SUPABASE_SETUP_GUIDE.md) for configuration details.
 
 ## Key Technologies
 
 - **React 18** with TypeScript
 - **Vite** build tool
+- **Clerk** for authentication and user management
+- **Supabase** (PostgreSQL) for database with Row-Level Security
 - **Tailwind CSS** + **shadcn/ui** for styling
 - **jsPDF** for report generation
 - **Recharts** for data visualization
 - **date-fns** for date handling
+- **Vitest** + **Testing Library** for testing
