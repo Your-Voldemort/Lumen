@@ -128,9 +128,13 @@ export function useSupabaseUser() {
     if (!clerkUser) throw new Error('No authenticated user');
 
     try {
+      // Get email with fallback to prevent constraint violations
+      const userEmail = clerkUser.emailAddresses?.[0]?.emailAddress || 
+                       `${clerkUser.id}@clerk.local`;
+      
       const dbUser: Omit<DatabaseUser, 'created_at' | 'updated_at'> = {
         id: clerkUser.id,
-        email: clerkUser.emailAddresses?.[0]?.emailAddress || '',
+        email: userEmail,
         first_name: profileData.firstName,
         last_name: profileData.lastName,
         role: profileData.role,
@@ -139,18 +143,22 @@ export function useSupabaseUser() {
         student_id: profileData.studentId || undefined,
       };
 
-      console.log('Creating user profile:', dbUser);
+      console.log('Creating/updating user profile:', dbUser);
 
+      // Use upsert to handle existing users gracefully
       const { data, error } = await supabase
         .from('users')
-        .insert([dbUser])
+        .upsert([dbUser], { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        })
         .select('id, email, first_name, last_name, role, department, year, student_id, created_at, updated_at')
         .single();
 
-      console.log('Insert result:', { data, error });
+      console.log('Upsert result:', { data, error });
 
       if (error) {
-        console.error('Insert error:', error);
+        console.error('Upsert error:', error);
         throw error;
       }
 
@@ -171,8 +179,43 @@ export function useSupabaseUser() {
       return mappedUser;
     } catch (err) {
       console.error('Error creating user profile:', err);
+      
+      // Handle specific error cases
+      if (err && typeof err === 'object' && 'code' in err) {
+        const dbError = err as any;
+        if (dbError.code === '23505') {
+          // Duplicate key error - try to load existing user instead
+          console.log('User already exists, trying to load existing profile...');
+          try {
+            const { data: existingUser, error: loadError } = await supabase
+              .from('users')
+              .select('id, email, first_name, last_name, role, department, year, student_id')
+              .eq('id', clerkUser.id)
+              .single();
+              
+            if (!loadError && existingUser) {
+              const mappedUser: AppUser = {
+                id: existingUser.id,
+                name: `${existingUser.first_name} ${existingUser.last_name}`.trim(),
+                email: existingUser.email,
+                role: existingUser.role,
+                department: existingUser.department,
+                year: existingUser.year || undefined,
+                studentId: existingUser.student_id || undefined,
+              };
+              
+              setAppUser(mappedUser);
+              toast.success('Profile loaded successfully!');
+              return mappedUser;
+            }
+          } catch (loadErr) {
+            console.error('Failed to load existing user:', loadErr);
+          }
+        }
+      }
+      
       const errorMessage = err instanceof Error ? err.message : 'Failed to create profile';
-      toast.error(errorMessage);
+      toast.error('Profile setup failed. Please try again or contact support.');
       throw new Error(errorMessage);
     }
   };
