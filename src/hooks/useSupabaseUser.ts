@@ -68,6 +68,7 @@ export function useSupabaseUser() {
         setError(null);
 
         console.log('Loading user for Clerk ID:', clerkUser.id);
+        console.log('Clerk user email:', clerkUser.emailAddresses?.[0]?.emailAddress);
         
         // Test Supabase connection first
         await testSupabaseConnection();
@@ -80,6 +81,7 @@ export function useSupabaseUser() {
           .maybeSingle();
 
         console.log('Supabase query result:', { dbUser, fetchError });
+        console.log('User found in database:', !!dbUser);
 
         if (fetchError) {
           console.error('Supabase fetch error:', fetchError);
@@ -279,6 +281,8 @@ export function useSupabaseUser() {
     error,
     createUserProfile,
     updateUserProfile,
-    needsProfileSetup: isSignedIn && !loading && !appUser,
+    // Only indicate profile setup is needed if we're sure the user doesn't exist
+    // and there are no connection/loading errors
+    needsProfileSetup: isSignedIn && !loading && !appUser && !error,
   };
 }
