@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import App from "./App";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
@@ -135,13 +135,34 @@ export default function ClerkAppRouter() {
 
   // Setup completion wrapper component to handle navigation properly
   const SetupWrapper = () => {
-    const navigate = useNavigate();
+    const [isCompleting, setIsCompleting] = useState(false);
     
-    const handleRoleSetupComplete = () => {
-      console.log('Role setup completed, navigating to dashboard');
-      // Navigate to dashboard instead of reloading
-      navigate('/', { replace: true });
+    const handleRoleSetupComplete = async () => {
+      console.log('Role setup completed, refreshing user state');
+      setIsCompleting(true);
+      
+      try {
+        // Force a small delay to let Supabase update
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Force page reload instead of navigation to refresh all state
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Setup completion error:', error);
+        setIsCompleting(false);
+      }
     };
+
+    if (isCompleting) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p>Completing setup...</p>
+          </div>
+        </div>
+      );
+    }
 
     return needsProfileSetup ? (
       <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />

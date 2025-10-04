@@ -34,39 +34,95 @@ export function SupabaseRoleSetup({ onComplete }: SupabaseRoleSetupProps) {
     }
   }, []);
 
+  // Debug mode: Skip setup if localStorage flag is set
+  useEffect(() => {
+    if (import.meta.env.DEV && localStorage.getItem('debug_skip_setup') === 'true') {
+      console.log('Debug: Skipping setup');
+      setTimeout(() => {
+        localStorage.removeItem('debug_skip_setup');
+        onComplete();
+      }, 1000);
+    }
+  }, [onComplete]);
+
+  // Add keyboard shortcut for emergency bypass
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      const handleKeyPress = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+          console.log('Manual setup override triggered');
+          localStorage.setItem('debug_skip_setup', 'true');
+          window.location.reload();
+        }
+      };
+      
+      window.addEventListener('keydown', handleKeyPress);
+      return () => window.removeEventListener('keydown', handleKeyPress);
+    }
+  }, []);
+
   const handleSubmit = async () => {
+    console.log('Setup form submitted with data:', { selectedRole, formData });
+    
+    // Trim whitespace and validate
+    const firstName = formData.firstName.trim();
+    const lastName = formData.lastName.trim();
+    const department = formData.department.trim();
+    
     if (!selectedRole) {
+      console.log('Error: No role selected');
       toast.error('Please select a role');
       return;
     }
 
-    if (!formData.firstName || !formData.lastName || !formData.department) {
+    if (!firstName || !lastName || !department) {
+      console.log('Error: Missing required fields', { 
+        firstName: !!firstName, 
+        lastName: !!lastName, 
+        department: !!department 
+      });
       toast.error('Please fill in all required fields');
       return;
     }
 
-    if (selectedRole === 'student' && (!formData.year || !formData.studentId)) {
-      toast.error('Please fill in all student information');
-      return;
+    if (selectedRole === 'student') {
+      const year = formData.year.trim();
+      const studentId = formData.studentId.trim();
+      
+      if (!year || !studentId) {
+        console.log('Error: Missing student fields', { 
+          year: !!year, 
+          studentId: !!studentId 
+        });
+        toast.error('Please fill in all student information');
+        return;
+      }
     }
 
     setIsLoading(true);
+    console.log('Starting profile creation...');
 
     try {
-      await createUserProfile({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+      const result = await createUserProfile({
+        firstName,
+        lastName,
         role: selectedRole,
-        department: formData.department,
-        year: selectedRole === 'student' ? formData.year : undefined,
-        studentId: selectedRole === 'student' ? formData.studentId : undefined,
+        department,
+        year: selectedRole === 'student' ? formData.year.trim() : undefined,
+        studentId: selectedRole === 'student' ? formData.studentId.trim() : undefined,
       });
 
+      console.log('Profile creation successful:', result);
       toast.success('Profile setup completed!');
-      onComplete();
+      
+      // Add delay before calling onComplete to ensure state updates
+      setTimeout(() => {
+        onComplete();
+      }, 500);
+      
     } catch (error) {
       console.error('Error creating profile:', error);
-      // Error toast is already shown by the hook
+      toast.error('Setup failed. Please try again or contact support.');
     } finally {
       setIsLoading(false);
     }
@@ -228,10 +284,23 @@ export function SupabaseRoleSetup({ onComplete }: SupabaseRoleSetupProps) {
             <Button 
               onClick={handleSubmit} 
               className="w-full"
-              disabled={isLoading}
+              disabled={isLoading || !selectedRole || !formData.firstName.trim() || !formData.lastName.trim() || !formData.department.trim()}
             >
-              {isLoading ? 'Setting up...' : 'Complete Setup'}
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Setting up...
+                </>
+              ) : (
+                'Complete Setup'
+              )}
             </Button>
+            
+            {import.meta.env.DEV && (
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Dev mode: Press Ctrl+Shift+X to skip setup
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
