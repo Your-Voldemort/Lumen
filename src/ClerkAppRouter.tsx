@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useUser } from '@clerk/clerk-react';
 import App from "./App";
 import { RoleSelectionPage } from "./components/auth/RoleSelectionPage";
@@ -8,13 +8,14 @@ import { SupabaseRoleSetup } from "./components/supabase-auth/SupabaseRoleSetup"
 import { ProtectedRoute } from "./components/clerk-auth/ProtectedRoute";
 import { useSupabaseUser } from "./hooks/useSupabaseUser";
 import { QuickSupabaseFix } from "./components/debug/QuickSupabaseFix";
+import { UserDebugInfo } from "./components/debug/UserDebugInfo";
 import { useState, useEffect } from "react";
 import { Toaster } from "./components/ui/sonner";
 import type { Activity } from "./App";
 
 export default function ClerkAppRouter() {
   const { isLoaded, isSignedIn } = useUser();
-  const { user, needsProfileSetup } = useSupabaseUser();
+  const { user, needsProfileSetup, loading, error } = useSupabaseUser();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [users, setUsers] = useState<any[]>([]);
 
@@ -134,13 +135,34 @@ export default function ClerkAppRouter() {
 
   // Setup completion wrapper component to handle navigation properly
   const SetupWrapper = () => {
-    const navigate = useNavigate();
+    const [isCompleting, setIsCompleting] = useState(false);
     
-    const handleRoleSetupComplete = () => {
-      console.log('Role setup completed, navigating to dashboard');
-      // Navigate to dashboard instead of reloading
-      navigate('/', { replace: true });
+    const handleRoleSetupComplete = async () => {
+      console.log('Role setup completed, refreshing user state');
+      setIsCompleting(true);
+      
+      try {
+        // Force a small delay to let Supabase update
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Force page reload instead of navigation to refresh all state
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Setup completion error:', error);
+        setIsCompleting(false);
+      }
     };
+
+    if (isCompleting) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p>Completing setup...</p>
+          </div>
+        </div>
+      );
+    }
 
     return needsProfileSetup ? (
       <SupabaseRoleSetup onComplete={handleRoleSetupComplete} />
@@ -167,22 +189,38 @@ export default function ClerkAppRouter() {
           element={
             isSignedIn ? (
               <ProtectedRoute redirectTo="/select-role">
-                {needsProfileSetup ? (
-                  <Navigate to="/setup" replace />
-                ) : (
-                  <>
-                    <App 
-                      currentUser={user}
-                      setCurrentUser={() => {}} // Not needed with Supabase
-                      activities={activities}
-                      setActivities={setActivities}
-                      users={users}
-                      setUsers={setUsers}
-                      onLogout={() => {}} // Handled by Clerk
-                    />
-                    <Toaster position="bottom-right" />
-                  </>
-                )}
+                {(() => {
+                  // Show loading spinner while still loading user data
+                  if (!isLoaded || loading) {
+                    return (
+                      <div className="min-h-screen flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                      </div>
+                    );
+                  }
+                  
+                  // Only redirect to setup if we're sure user needs profile setup
+                  // and not due to loading/connection errors
+                  if (needsProfileSetup && !user && !loading && !error) {
+                    return <Navigate to="/setup" replace />;
+                  }
+                  
+                  // Show main app (even if user is null due to errors, let app handle it)
+                  return (
+                    <>
+                      <App 
+                        currentUser={user}
+                        setCurrentUser={() => {}} // Not needed with Supabase
+                        activities={activities}
+                        setActivities={setActivities}
+                        users={users}
+                        setUsers={setUsers}
+                        onLogout={() => {}} // Handled by Clerk
+                      />
+                      <Toaster position="bottom-right" />
+                    </>
+                  );
+                })()}
               </ProtectedRoute>
             ) : (
               <Navigate to="/select-role" replace />
@@ -267,6 +305,18 @@ export default function ClerkAppRouter() {
             <ProtectedRoute redirectTo="/select-role">
               <QuickSupabaseFix />
             </ProtectedRoute>
+          } 
+        />
+
+        {/* Debug route for user state */}
+        <Route 
+          path="/debug-user" 
+          element={
+            <div className="min-h-screen bg-gray-50 py-8">
+              <div className="max-w-4xl mx-auto">
+                <UserDebugInfo />
+              </div>
+            </div>
           } 
         />
 
